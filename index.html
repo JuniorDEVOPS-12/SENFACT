@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>SENFACT</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <!-- Page de connexion -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1>SENFACT</h1>
+                <p>Connectez-vous à votre espace de gestion</p>
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="votre@email.com" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="loginPassword" placeholder="Votre mot de passe">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="rememberMe"> Se souvenir de moi
+                    </label>
+                </div>
+                <button class="btn-login" onclick="login()">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Se connecter
+                </button>
+                <button class="btn-register" onclick="showRegister()">
+                    <i class="fas fa-user-plus"></i> Créer un compte
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page d'inscription -->
+    <div id="registerPage" class="login-container" style="display: none;">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1>Créer un compte</h1>
+                <p>Inscrivez-vous pour gérer votre business</p>
+            </div>
+            <div class="login-form">
+                <div class="form-group">
+                    <label>Nom complet</label>
+                    <input type="text" id="registerName" placeholder="Votre nom">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="votre@email.com">
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="registerPassword" placeholder="Minimum 6 caractères">
+                </div>
+                <div class="form-group">
+                    <label>Confirmer le mot de passe</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="Confirmer le mot de passe">
+                </div>
+                <button class="btn-login" onclick="register()">
+                    <i class="fas fa-check-circle"></i> S'inscrire
+                </button>
+                <button class="btn-register" onclick="showLogin()">
+                    <i class="fas fa-arrow-left"></i> Retour à la connexion
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application principale -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        <!-- Header sans status bar -->
+        <div class="header" id="header">
+            <div class="header-content">
+                <button class="menu-btn" onclick="toggleMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-text">
+                    <h1 id="pageTitle">Tableau de bord</h1>
+                    <p id="pageSubtitle">Gérez votre business</p>
+                </div>
+                <div class="header-actions">
+                    <i class="fas fa-sign-out-alt" onclick="logout()" style="cursor: pointer;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Side Menu -->
+        <div class="side-menu" id="sideMenu">
+            <div class="menu-overlay" onclick="toggleMenu()"></div>
+            <div class="menu-content">
+                <div class="menu-header">
+                    <div class="menu-avatar">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3>SENFACT</h3>
+                    <p id="userEmailDisplay">Gestion professionnelle</p>
+                </div>
+                <div class="menu-items">
+                    <div class="menu-item" onclick="navigateTo('dashboard')">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Tableau de bord</span>
+                    </div>
+                    <div class="menu-item" onclick="navigateTo('clients')">
+                        <i class="fas fa-users"></i>
+                        <span>Clients</span>
+                    </div>
+                    <div class="menu-item" onclick="navigateTo('products')">
+                        <i class="fas fa-box"></i>
+                        <span>Produits</span>
+                    </div>
+                    <div class="menu-item" onclick="navigateTo('invoices')">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Factures</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="page active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">CA du mois</span>
+                            <span class="stat-value" id="monthlyRevenue">0 FCFA</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-label">Total factures</span>
+                            <span class="stat-value" id="totalInvoices">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>Factures par statut</h3>
+                </div>
+                <div class="stats-status" id="statusStats">
+                    <div class="status-stat draft">
+                        <span class="status-label">Brouillon</span>
+                        <span class="status-count" id="draftCount">0</span>
+                    </div>
+                    <div class="status-stat sent">
+                        <span class="status-label">Envoyée</span>
+                        <span class="status-count" id="sentCount">0</span>
+                    </div>
+                    <div class="status-stat paid">
+                        <span class="status-label">Payée</span>
+                        <span class="status-count" id="paidCount">0</span>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h3>Actions rapides</h3>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="openInvoiceModal()">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Nouvelle facture</span>
+                    </button>
+                    <button class="quick-btn" onclick="navigateTo('clients')">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Ajouter client</span>
+                    </button>
+                    <button class="quick-btn" onclick="navigateTo('products')">
+                        <i class="fas fa-cube"></i>
+                        <span>Ajouter produit</span>
+                    </button>
+                    <button class="quick-btn" onclick="exportCSV()">
+                        <i class="fas fa-download"></i>
+                        <span>Export CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Clients Section -->
+            <div id="clients" class="page">
+                <div class="page-header">
+                    <h2>Clients</h2>
+                    <button class="btn-fab" onclick="openClientModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchClientInput" placeholder="Rechercher par nom ou email..." onkeyup="searchClients()">
+                </div>
+                <div id="clientsList" class="clients-list"></div>
+            </div>
+
+            <!-- Products Section -->
+            <div id="products" class="page">
+                <div class="page-header">
+                    <h2>Produits</h2>
+                    <button class="btn-fab" onclick="openProductModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="productsList" class="products-list"></div>
+            </div>
+
+            <!-- Invoices Section -->
+            <div id="invoices" class="page">
+                <div class="page-header">
+                    <h2>Factures</h2>
+                    <button class="btn-fab" onclick="openInvoiceModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="invoicesList" class="invoices-list"></div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="navigateTo('dashboard')">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('clients')">
+                <i class="fas fa-users"></i>
+                <span>Clients</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('products')">
+                <i class="fas fa-box"></i>
+                <span>Produits</span>
+            </div>
+            <div class="nav-item" onclick="navigateTo('invoices')">
+                <i class="fas fa-file-invoice"></i>
+                <span>Factures</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-overlay" onclick="closeClientModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Client</h3>
+                <button class="modal-close" onclick="closeClientModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="clientId">
+                <div class="form-group">
+                    <label>Nom complet *</label>
+                    <input type="text" id="clientName" placeholder="Ex: Jean Dupont" required>
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="clientEmail" placeholder="client@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="clientPhone" placeholder="6X XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label>Adresse</label>
+                    <textarea id="clientAddress" rows="3" placeholder="Adresse complète"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeClientModal()">Annuler</button>
+                <button class="btn-primary" onclick="saveClient()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-overlay" onclick="closeProductModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Produit / Service</h3>
+                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label>Libellé *</label>
+                    <input type="text" id="productName" placeholder="Ex: Consultation" required>
+                </div>
+                <div class="form-group">
+                    <label>Prix unitaire HT (FCFA) *</label>
+                    <input type="number" id="productPrice" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label>TVA (%) *</label>
+                    <input type="number" id="productTva" value="18" step="0.5" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeProductModal()">Annuler</button>
+                <button class="btn-primary" onclick="saveProduct()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div class="modal modal-large" id="invoiceModal">
+        <div class="modal-overlay" onclick="closeInvoiceModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="invoiceModalTitle">Nouvelle facture</h3>
+                <button class="modal-close" onclick="closeInvoiceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="invoiceId">
+                <div class="form-group">
+                    <label>Client *</label>
+                    <select id="invoiceClient" class="form-select" required>
+                        <option value="">Sélectionner un client</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Statut</label>
+                    <select id="invoiceStatus" class="form-select">
+                        <option value="Brouillon">📝 Brouillon</option>
+                        <option value="Envoyée">📧 Envoyée</option>
+                        <option value="Payée">✅ Payée</option>
+                    </select>
+                </div>
+                
+                <div class="section-title-sm">
+                    <h4>Lignes de facture</h4>
+                    <button class="btn-icon" onclick="addInvoiceLine()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                
+                <div id="invoiceLinesContainer" class="invoice-lines"></div>
+                
+                <div class="totals-card">
+                    <div class="total-row">
+                        <span>Total HT</span>
+                        <span id="totalHT">0 FCFA</span>
+                    </div>
+                    <div class="total-row">
+                        <span>TVA</span>
+                        <span id="totalTVA">0 FCFA</span>
+                    </div>
+                    <div class="total-row grand-total">
+                        <span>Total TTC</span>
+                        <span id="totalTTC">0 FCFA</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeInvoiceModal()">Annuler</button>
+                <button class="btn-primary" onclick="saveInvoice()">Enregistrer</button>
+                <button class="btn-danger" id="deleteInvoiceBtn" style="display:none;" onclick="deleteCurrentInvoice()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
